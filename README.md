@@ -130,7 +130,6 @@ Once filled in, you can either run the solver directly or **save it as a draft**
 
 ## Where do I add my API key? 
 
-
 Currently, the API key is set directly in the main script. Open `Route_Optimization.py` and find this line near the top:
 
 \`\`\`python
@@ -193,6 +192,41 @@ There's no file to prepare — data is entered via form fields in the app. Each 
 | Max travel distance | Decimal (km) | `200` |
 
 Addresses are validated and geocoded automatically as you type — the app will show matching suggestions on the map before you confirm a stop.
+
+## Sample Data (Try It Yourself)
+
+Use the values below to test the app end-to-end with a small, realistic example — 1 start location, 4 stops (including one pickup/delivery pair), and 2 vehicles.
+
+**Start Location**
+| Field | Value |
+|---|---|
+| Address | `100 Main St, Springfield, IL` |
+| Load time | `10` min |
+| Time window | `08:00` – `18:00` |
+
+**Stops**
+| # | Address | Type | Weight | Volume | Load/Unload Time | Time Window |
+|---|---|---|---|---|---|---|
+| 1 | `245 Oak Ave, Springfield, IL` | Delivery | `-50` | `-2.0` | `5` / `10` min | `09:00` – `11:00` |
+| 2 | `88 Maple Dr, Springfield, IL` | Delivery | `-30` | `-1.5` | `5` / `10` min | `10:00` – `13:00` |
+| 3 | `312 Birch Ln, Springfield, IL` | Pickup | `40` | `1.8` | `10` / `5` min | `09:30` – `12:00` |
+| 4 | `77 Cedar Ct, Springfield, IL` | Delivery | `-40` | `-1.8` | `5` / `10` min | `12:00` – `15:00` |
+
+> Pair stop **3 (Pickup)** with stop **4 (Delivery)** in the Pickups & Deliveries section — the package picked up at Birch Ln gets dropped off at Cedar Ct.
+
+**Vehicles**
+| Vehicle | Max Weight | Max Volume | Fixed Cost | Variable Cost | Max Travel Time | Break/Wait Allowance |
+|---|---|---|---|---|---|---|
+| Vehicle 1 | `500` | `20` | `50.00` | `1.25` | `480` min | `30` min |
+| Vehicle 2 | `500` | `20` | `50.00` | `1.25` | `480` min | `30` min |
+
+**Global Optimization Settings**
+| Field | Value |
+|---|---|
+| Penalty (dropped stop cost) | `500` |
+| Max travel distance | `200` km |
+
+Once entered, run the solver — you should see both vehicles assigned routes, the pickup/delivery pair kept on the same vehicle and in the correct order, and a results dashboard showing total distance, time, and cost.
 
 ## Limitations
 
