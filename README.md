@@ -1,9 +1,13 @@
-FAQ [TEMPLATE PLACEHOLDER]
+FAQ
 General
 
-What does this project do? [Project Name] is a vehicle route optimization system that generates the most efficient delivery/pickup routes based on user-defined constraints (e.g., cargo capacity, fuel limits, delivery quantities). It outputs an interactive dashboard with optimized routes and AI-generated suggestions.
+What does this project do?
+
+The Route-Optimization-Application is a route optimization system that uses Google OR-Tools to generate the most efficient transportation routes that a vehicle can take based on specified user-defined constraints (e.g. cargo capacity, delivery quantities, etc.). Once the user insert at-least a single vehicle, the user can then run the route optimization which would then generate a dashboard, showing the optimized routes as well as areas where the user can improve in; through KPIs and charts as well as AI generated suggestions from Google AIStudios Gemini API.
 
 Who is this for? Logistics teams, small business owners, students, or anyone looking to explore vehicle routing problems (VRP) with real-world constraints.
+
+
 
 What problem does this solve? Manually planning delivery routes is time-consuming and rarely optimal. This tool automates that process using constraint-based optimization, saving time and reducing fuel/operational costs.
 
