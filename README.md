@@ -53,13 +53,46 @@ After a route is solved, the results (vehicle count, capacity limits, total dist
 
 ## What does the dashboard show?
 
-Optimized route visualization (map or list view)
-Vehicle-by-vehicle breakdown (stops, load, distance)
-Total distance/time/cost savings vs. unoptimized baseline
-AI-generated recommendations
-Setup & Usage
+- Optimized route visualization
+- Vehicle-by-vehicle breakdown (route sequence, stops, capacity utilization)
+- Total distance, total time, and estimated cost — each compared against a baseline (the route as originally entered, unoptimized)
+- Number of stops served vs. dropped (with a list of any dropped addresses)
+- An overall route health score
+- AI-generated recommendations for further improvements
 
-## What are the prerequisites?
+## Setup & Usage
+
+1. **Add your Gemini API key**
+   Open the main script and paste your key into the `API_KEY` variable near the top of the file:
+```python
+   API_KEY = 'your-api-key-here'
+```
+   Get a key from [Google AI Studio](https://aistudio.google.com/).
+
+2. **Run the app**
+```bash
+   python Route_Optimization.py
+```
+
+3. **From the home screen**, choose:
+   - **New Optimization** — build a route from scratch
+   - **Load Optimizations** — reopen a previously saved draft
+   - **Settings** — app configuration
+
+4. **Set up a new optimization**
+   - Enter your start location and any global settings (date, number of vehicles, etc.)
+   - Add stops on the map, including pickup/delivery pairs if needed
+   - Configure vehicles (capacity, cost, max travel time/distance)
+   - Set optimization constraints (time windows, penalties for dropped stops, etc.)
+
+5. **Run the solver**
+   The app geocodes your addresses, builds a driving distance/time matrix via OSRM, and solves the route with OR-Tools.
+
+6. **Review results**
+   View the optimized routes, per-vehicle breakdowns, cost/time/distance savings, dropped stops, and AI-generated suggestions from Gemini.
+
+7. **Save or reload**
+   Save your optimization as a draft to revisit later from the **Load Optimizations** screen — drafts are stored locally as JSON files in the `drafts/` folder.
 
 ## Prerequisites
 
@@ -67,17 +100,18 @@ Python 3.9+
 Required libraries: ortools, ttkbootstrap, customtkinter, tkintermapview, tkcalendar, requests, google-genai, geopy, pywinstyles (Windows only)
 A Google AI Studio / Gemini API key (see Configuration)
 
-How do I install this?
+## How do I install this?
 
 bash
 git clone https://github.com/[username]/[repo-name].git
 cd [repo-name]
 pip install -r requirements.txt
 
-How do I run it?
+## How do I run it?
 
-bash
-[insert run command, e.g., streamlit run app.py]
+\`\`\`bash
+python Route_Optimization.py
+\`\`\`
 
 How do I input my own data? [Explain expected input format — CSV columns, JSON schema, or UI form fields]
 
