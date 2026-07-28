@@ -130,32 +130,121 @@ Once filled in, you can either run the solver directly or **save it as a draft**
 
 ## Where do I add my API key? 
 
-[Explain — .env file, config.py, environment variable, etc.]
 
-Data & Privacy
+Currently, the API key is set directly in the main script. Open `Route_Optimization.py` and find this line near the top:
 
-Does this store or share my data? [Explain — e.g., "No. All processing happens locally; data is not stored or transmitted beyond the optimization and AI API calls."]
+\`\`\`python
+#INSERT API KEY GEMINI
+API_KEY = ''
+\`\`\`
 
-What format does input data need to be in? [Specify columns/fields required, with an example row or template file link]
+Paste your Gemini API key between the quotes:
 
-Limitations
+\`\`\`python
+API_KEY = 'your-api-key-here'
+\`\`\`
 
-What are the current limitations?
+Get a key from [Google AI Studio](https://aistudio.google.com/)
 
-[e.g., Assumes static traffic conditions / no real-time rerouting]
-[e.g., Optimized for single-depot problems]
-[e.g., Max number of stops/vehicles supported]
+## Data & Privacy
 
-Does this account for real-time traffic or road closures? [Yes/No — explain]
+Your addresses and route data are **not stored on any external server** — everything is saved locally on your machine as JSON draft files. However, some data is transmitted to third-party services in order for the app to function:
 
-Troubleshooting
+- **Geocoding** — addresses you enter are sent to OpenStreetMap's Nominatim service (and/or ArcGIS) to convert them into coordinates.
+- **Routing (OSRM)** — coordinates are sent to the public OSRM routing server to calculate driving distances and durations.
+- **AI Suggestions (Gemini)** — after a route is solved, aggregated route data (vehicle counts, costs, node sequences, time windows, dropped stops) is sent to Google's Gemini API to generate improvement suggestions.
 
-I'm getting a solver error / no feasible solution found. What do I do? This usually means constraints are too restrictive (e.g., cargo capacity too low for demand). Try loosening constraints or checking for data entry errors.
+No data is sold, shared for advertising, or retained by this application beyond the local draft files you choose to save. That said, this project relies on public/third-party APIs (Nominatim, OSRM, Gemini), so you should review their respective privacy policies if you're working with sensitive or proprietary location data.
 
-The AI suggestions aren't loading. What should I check? Confirm your API key is valid and correctly set in [location]. Check API usage limits if applicable.
+## What format does input data need to be in?
 
-Contributing / Contact
+There's no file to prepare — data is entered via form fields in the app. Each field expects the following:
 
-Can I contribute to this project? Yes! Feel free to open an issue or submit a pull request. [Add contribution guidelines link if available]
+**Start Location**
+| Field | Format | Example |
+|---|---|---|
+| Address | Text (US address) | `100 Main St, Springfield, IL` |
+| Load time | Integer (minutes) | `15` |
+| Weight / Volume | Decimal | `0` / `0` |
+| Time window | HH:MM – HH:MM | `08:00` – `17:00` |
 
-Who do I contact with questions? [Your name / LinkedIn / email]
+**Each Stop**
+| Field | Format | Example |
+|---|---|---|
+| Address | Text (US address) | `245 Oak Ave, Springfield, IL` |
+| Stop type | Dropdown: Pickup / Delivery | `Delivery` |
+| Weight / Volume | Decimal (negative if Delivery) | `-25.5` / `-1.2` |
+| Load / Unload time | Integer (minutes) | `10` / `10` |
+| Time window | HH:MM – HH:MM | `09:00` – `12:00` |
+
+**Vehicle**
+| Field | Format | Example |
+|---|---|---|
+| Max weight / volume | Decimal | `1000` / `50` |
+| Fixed cost | Decimal | `50.00` |
+| Variable cost | Decimal (per distance unit) | `1.25` |
+| Max travel time | Decimal (minutes) | `480` |
+| Break/wait allowance | Decimal (minutes) | `30` |
+
+**Global Optimization Settings**
+| Field | Format | Example |
+|---|---|---|
+| Penalty (dropped stop cost) | Decimal | `500` |
+| Max travel distance | Decimal (km) | `200` |
+
+Addresses are validated and geocoded automatically as you type — the app will show matching suggestions on the map before you confirm a stop.
+
+## Limitations
+
+## What are the current limitations?
+
+- **Single depot only** — the solver supports one shared start/end depot setup; it's not designed for multi-depot fleets.
+- **No real-time traffic or rerouting** — OSRM distances/durations are static, point-in-time estimates and don't account for live traffic, road closures, or conditions changing after the route is solved.
+- **US addresses only** — address autocomplete/geocoding is restricted to US locations (`country_codes=['us']`); international addresses are not currently supported.
+- **Relies on the public OSRM demo server** — the app calls `router.project-osrm.org` over plain HTTP, which is rate-limited, has no uptime guarantee, and is not intended for production/commercial use. Large stop counts may fail or time out.
+- **Geocoding is rate-limited** — Nominatim requests are throttled to one every 3 seconds, so entering many stops can be slow.
+- **Solver time limit is fixed at 1 second** — routes are computed with a hardcoded 1-second search window (`time_limit.FromSeconds(1)`), which may return suboptimal solutions for larger or more complex problems rather than the true optimum.
+- **Global settings are only read from the first vehicle** — max travel time, break allowance, penalty weight, and max travel distance are pulled from vehicle #1's inputs and applied to all vehicles, rather than being configurable independently per vehicle or truly global.
+- **Costs and distances are rounded to integers** — fixed/variable costs and OSRM distance/duration values are rounded, which can introduce small inaccuracies in cost and ETA calculations.
+- **No practical cap enforced on stops/vehicles**, but performance will degrade with larger inputs due to the OSRM table size limits, the fixed 1-second solver time limit, and Nominatim's rate limiting — the app has not been tested/tuned for large-scale (e.g. 100+ stop) problems.
+- **AI suggestions are advisory only** — Gemini's recommendations are displayed for review; they are not automatically applied to the route.
+- **No authentication or multi-user support** — this is a single-user desktop tool; saved drafts are plain local JSON files with no encryption or access control.
+- **API key is hardcoded in source** — the Gemini API key currently lives directly in the script rather than an environment variable, which is a security risk if the file is shared or committed with a real key.
+- **Windows-only visual styling** — `pywinstyles` (used for title-bar theming) only works on Windows; the app may look different or throw errors for that feature on macOS/Linux.
+- **Single-threaded UI** — geocoding, OSRM, and Gemini API calls run on the main thread, so the UI can freeze/appear unresponsive during those requests.
+
+## Does this account for real-time traffic or road closures?
+
+No. Routing distances and travel times come from OSRM, which calculates estimates using the real OpenStreetMap road network (road types, geometry, turn restrictions, one-way streets), but with **static, pre-set speed profiles** — not live data. It does not factor in current traffic congestion, accidents, road closures, construction, or time-of-day variation. A route solved at 2 AM and the same route solved during rush hour will return identical time estimates, even though real-world drive times would differ.
+
+## Troubleshooting
+
+## I'm getting a solver error / no feasible solution found. What do I do?
+
+This usually means the constraints you've entered are too tight for OR-Tools to find a valid route. Common causes to check first:
+
+- **Cargo capacity too low** — total weight/volume demand across your stops exceeds what your configured vehicles can carry. Increase vehicle capacity or add more vehicles.
+- **Time windows too narrow or conflicting** — a stop's time window may be too short to reach given travel time, or may not leave room for load/unload time. Widen the window or adjust load/unload durations.
+- **Max travel time or max travel distance set too low** — vehicles may not have enough time/range to complete their assigned stops. Increase these limits per vehicle.
+- **Pickup/delivery ordering conflicts** — a delivery's time window may occur before its paired pickup can realistically happen. Double-check pickup-before-delivery logic and time windows for paired stops.
+- **Data entry errors** — a stop with an incorrect address (e.g. geocoded to the wrong location) can create unrealistic travel times. Confirm each stop pinned correctly on the map before solving.
+- **Penalty weight too high or too low** — if "allow dropped stops" is enabled but the penalty is set very high, the solver may still fail rather than dropping a stop; try lowering the penalty so infeasible stops can be dropped instead of blocking the whole solution.
+
+**If you're not sure which constraint is the problem:** try temporarily loosening one constraint at a time (e.g., raise capacity, widen time windows) and re-run the solver to isolate which one is causing the infeasibility.
+
+## The AI suggestions aren't loading. What should I check?
+
+- **Confirm your API key is set correctly.** Open `Route_Optimization_old_2.py` and check that `API_KEY` (near the top of the file) contains a valid key from [Google AI Studio](https://aistudio.google.com/) and hasn't been left blank or with extra spaces/quotes.
+- **Check your internet connection** — the AI suggestions require a live call to the Gemini API.
+- **Check the console/terminal output.** Errors from the Gemini call are printed to the console (not shown in the UI), so run the app from a terminal and look for a message starting with `❌ Error compiling route updates via Gemini API:` — this will usually show the real cause (invalid key, quota exceeded, network error, etc.).
+- **Check API usage limits.** Google AI Studio keys have rate/quota limits on the free tier; if you've made many requests recently, you may be temporarily throttled.
+- **Confirm model availability.** This app calls the `gemini-3-flash-preview` model specifically — if that model name changes, is deprecated, or isn't available for your API key/region, the call will fail. Check [Google's model documentation](https://ai.google.dev/gemini-api/docs/models) for the current model name if this happens.
+- **No output at all?** If the solver didn't find a solution (see the previous FAQ), the AI suggestion step never runs, since there's no result to analyze yet.
+
+## Contributing / Contact
+
+## Can I contribute to this project? 
+
+Yes! Feel free to open an issue or submit a pull request. 
+
+
