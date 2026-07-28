@@ -15,8 +15,6 @@ Coordinating multiple vehicles and transportation routes is an challenging endea
 
 ## How It Works?
 
-## How It Works
-
 RouteForge is a desktop application (built with `tkinter` / `ttkbootstrap`) that turns a list of stops, vehicles, and constraints into an optimized delivery/dispatch plan.
 
 1. **Input** — On the "New Optimization" screen, you define your start location, stops (including optional pickup/delivery pairs), vehicles, and constraints (capacity, time windows, load/unload times, max travel distance, penalties for dropped stops, etc.).
@@ -37,12 +35,20 @@ This project uses Google OR-Tools vehicle routing optimization
 
 ## What constraints can I define?
 
-Vehicle cargo capacity
-Pickup and delivery quantities
-Fuel/range limits
-[Add others: time windows, number of vehicles, depot locations, etc.]
+- Vehicle cargo capacity (weight and volume)
+- Pickup and delivery quantities and pairings
+- Fuel/range limits (max travel distance per vehicle)
+- Time windows (per stop, and for the start/end depot)
+- Number of vehicles
+- Depot/start location(s)
+- Load and unload time per stop
+- Maximum travel time per vehicle
+- Break/wait time allowance
+- Fixed and variable cost per vehicle
+- Penalty cost for dropped/unassigned stops
 
-## How are AI suggestions generated? Route data is passed to the Gemini API (via Google AI Studio), which analyzes the optimized routes and returns natural-language suggestions for further efficiency improvements.
+## How are AI suggestions generated? 
+Route data is passed to the Gemini API (via Google AI Studio), which analyzes the optimized routes and returns natural-language suggestions for further efficiency improvements.
 
 ## What does the dashboard show?
 
