@@ -103,8 +103,8 @@ A Google AI Studio / Gemini API key (see Configuration)
 ## How do I install this?
 
 bash
-git clone https://github.com/[username]/[repo-name].git
-cd [repo-name]
+git clone https://github.com/Kilski64/Route-Optimization-Application.git
+cd Route-Optimization-Application
 pip install -r requirements.txt
 
 ## How do I run it?
