@@ -113,9 +113,24 @@ pip install -r requirements.txt
 python Route_Optimization.py
 \`\`\`
 
-How do I input my own data? [Explain expected input format — CSV columns, JSON schema, or UI form fields]
+## How do I input my own data?
 
-Where do I add my API key? [Explain — .env file, config.py, environment variable, etc.]
+Data is entered directly through the app's UI on the **New Optimization** screen — there's no CSV or JSON file to prepare in advance. The form is broken into sections:
+
+- **General** — optimization name, start date, and other high-level settings
+- **Locations & Stops** — your start location plus each delivery/pickup stop, entered as an address (autocompleted and geocoded live on the map). Each stop can include:
+  - Weight and volume (demand)
+  - Load/unload time
+  - Time window (HH:MM start/end)
+- **Pickups & Deliveries** — pair up stops that must be picked up and dropped off by the same vehicle, in the correct order
+- **Vehicles** — for each vehicle: capacity (max weight/volume), fixed cost, variable (per-distance) cost, and max travel time/distance
+- **Optimization Settings** — global constraints like penalty weight for dropped stops and overall max travel distance
+
+Once filled in, you can either run the solver directly or **save it as a draft**, which stores everything as a JSON file in the `drafts/` folder (viewable and reloadable later from **Load Optimizations**).
+
+## Where do I add my API key? 
+
+[Explain — .env file, config.py, environment variable, etc.]
 
 Data & Privacy
 
