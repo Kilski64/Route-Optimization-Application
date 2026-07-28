@@ -15,8 +15,21 @@ Coordinating multiple vehicles and transportation routes is an challenging endea
 
 ## How It Works?
 
+## How It Works
 
-For details on how the Google OR-Tools Vehicle Routing engine internally works, refer to the Google OR-Tools vehicle routing library's documentation.
+RouteForge is a desktop application (built with `tkinter` / `ttkbootstrap`) that turns a list of stops, vehicles, and constraints into an optimized delivery/dispatch plan.
+
+1. **Input** — On the "New Optimization" screen, you define your start location, stops (including optional pickup/delivery pairs), vehicles, and constraints (capacity, time windows, load/unload times, max travel distance, penalties for dropped stops, etc.).
+
+2. **Geocoding** — Addresses are converted to coordinates using `geopy` (Nominatim/ArcGIS), and results are shown live on an interactive map via `tkintermapview`.
+
+3. **Distance & Duration Matrix** — Once all locations are geocoded, the app builds a real-world driving distance/duration matrix by querying the [OSRM](http://project-osrm.org/) routing API.
+
+4. **Optimization Engine** — The matrix and constraints are passed to Google OR-Tools' constraint solver (`ortools.constraint_solver`), which computes vehicle routes that respect time windows, capacity, pickup/delivery pairing, and other constraints, minimizing total cost/distance/time. For details on how the optimization engine itself works, consult the [OR-Tools routing documentation](https://developers.google.com/optimization/routing).
+
+5. **AI Co-Pilot (Gemini)** — After a solution is generated, the app can send the routing results (dropped stops, vehicle loads, time windows, costs) to Google's Gemini API, which analyzes the solution and suggests operational adjustments (re-sequencing, fleet expansion, time-window shifts, etc.) through structured function calls.
+
+6. **Results & Persistence** — Solved routes are displayed with dropped-stop reporting and AI-generated suggestions. Optimizations can be saved as drafts (JSON files) and reloaded later from the "Load Optimizations" screen.
 
 ## What optimization engine does this use? 
 
