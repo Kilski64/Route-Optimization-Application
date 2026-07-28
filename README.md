@@ -47,8 +47,9 @@ This project uses Google OR-Tools vehicle routing optimization
 - Fixed and variable cost per vehicle
 - Penalty cost for dropped/unassigned stops
 
-## How are AI suggestions generated? 
-Route data is passed to the Gemini API (via Google AI Studio), which analyzes the optimized routes and returns natural-language suggestions for further efficiency improvements.
+## How are AI suggestions generated?
+
+After a route is solved, the results (vehicle count, capacity limits, total distance/time, dropped stops, node sequences, time windows, and cost settings) are sent to the Gemini API. Rather than returning plain text, Gemini is given a structured function (`analyze_and_adjust_route`) to call, so it responds with a defined list of actionable strategies — each tagged with a type (e.g. re-sequencing, fleet expansion, time-window shift, capacity redundancy), an impact level (High/Medium/Low), a description, and an estimated time savings. These are displayed as suggestion cards in the results view. If no adjustments are warranted, Gemini instead returns a plain-language explanation.
 
 ## What does the dashboard show?
 
